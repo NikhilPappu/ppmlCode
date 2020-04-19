@@ -33,7 +33,9 @@ namespace aby4
             mShareGen[2].setKey(mFarCommon.get<block>());
 
             refillBuffer();
-            //std::cout << "yooo!" << mShareBuff[1].size() << std::endl;
+//            std::cout << *(u64*)((u8*)mShareBuff[0].data() + mShareIdx) << std::endl;
+//            std::cout << *(u64*)((u8*)mShareBuff[1].data() + mShareIdx) << std::endl;
+//            std::cout << *(u64*)((u8*)mShareBuff[2].data() + mShareIdx) << std::endl;
         }
         
         void init (u64 partyIdx, block seed, u64 buffSize = 256)
@@ -49,7 +51,7 @@ namespace aby4
             mShareGen[0].setKey(mFarCommon.get<block>());
         
             refillBuffer(); 
-            //std::cout << "yooo!" << mShareBuff[1].size() << std::endl;
+ //           std::cout << *(u64*)((u8*)mShareBuff[0].data() + mShareIdx) << std::endl;
         }
 
         void refillBuffer()
@@ -80,24 +82,29 @@ namespace aby4
             {
                 refillBuffer();
             }
-            i64 ret = 0;
+            
+            int x1, x2, x3;
+
+            i64 ret;
             if (mPartyIdx == 0)
             {
-                ret = *(u64*)((u8*)mShareBuff[0].data() + mShareIdx) +
-                      *(u64*)((u8*)mShareBuff[1].data() + mShareIdx) +
-                      *(u64*)((u8*)mShareBuff[2].data() + mShareIdx);
+                x1 = *(int*)((u8*)mShareBuff[0].data() + mShareIdx);
+                x2 = *(int*)((u8*)mShareBuff[1].data() + mShareIdx);
+                x3 = *(int*)((u8*)mShareBuff[2].data() + mShareIdx);
+                ret = (i64)(x1) + (i64)(x2) + (i64)(x3);
+                //std::cout << "ret " << ret << std::endl;
+
             }
             else
             {
-                ret = *(u64*)((u8*)mShareBuff[0].data() + mShareIdx); 
-
+                x1 = *(u64*)((u8*)mShareBuff[0].data() + mShareIdx); 
+                ret = (i64)(x1);
+                //std::cout << ret  << std::endl;
             }
             mShareIdx += sizeof(i64);
-
-            //ret = 0;
+             
             return ret;
         }
-
 
     };
 }

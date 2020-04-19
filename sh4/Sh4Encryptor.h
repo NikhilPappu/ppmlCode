@@ -27,6 +27,9 @@ namespace aby4
         
            
         si64 localInt(u64 partyIdx, CommPkg& comm, i64 val);
-        si64 remoteInt(u64 partyIdx, CommPkg& comm);
+        si64 remoteInt(u64 partyIdx, u64 sPartyIdx, CommPkg& comm);
+
+        void revealSend(CommPkg& comm, u64 partyIdx, const si64& x);
+        i64 revealRcv(CommPkg& comm, u64 partyIdx, const si64& x);
     };
 }
