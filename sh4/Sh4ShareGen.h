@@ -83,21 +83,21 @@ namespace aby4
                 refillBuffer();
             }
             
-            int x1, x2, x3;
+            short x1, x2, x3;
 
             i64 ret;
             if (mPartyIdx == 0)
             {
-                x1 = *(int*)((u8*)mShareBuff[0].data() + mShareIdx);
-                x2 = *(int*)((u8*)mShareBuff[1].data() + mShareIdx);
-                x3 = *(int*)((u8*)mShareBuff[2].data() + mShareIdx);
+                x1 = *(short*)((u8*)mShareBuff[0].data() + mShareIdx);
+                x2 = *(short*)((u8*)mShareBuff[1].data() + mShareIdx);
+                x3 = *(short*)((u8*)mShareBuff[2].data() + mShareIdx);
                 ret = (i64)(x1) + (i64)(x2) + (i64)(x3);
                 //std::cout << "ret " << ret << std::endl;
 
             }
             else
             {
-                x1 = *(u64*)((u8*)mShareBuff[0].data() + mShareIdx); 
+                x1 = *(short*)((u8*)mShareBuff[0].data() + mShareIdx); 
                 ret = (i64)(x1);
                 //std::cout << ret  << std::endl;
             }

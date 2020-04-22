@@ -1,6 +1,7 @@
 #pragma once
 #include "Sh4Types.h"
 #include "Sh4ShareGen.h"
+#include "Sh4Runtime.h"
 #include <cryptoTools/Common/MatrixView.h>
 
 namespace aby4
@@ -26,10 +27,18 @@ namespace aby4
         }
         
            
-        si64 localInt(u64 partyIdx, CommPkg& comm, i64 val);
-        si64 remoteInt(u64 partyIdx, u64 sPartyIdx, CommPkg& comm);
+        si64 localInt(CommPkg& comm, i64 val);
+        Sh4Task localInt(Sh4Task dep, i64 val, si64& dest);
 
-        void revealSend(CommPkg& comm, u64 partyIdx, const si64& x);
-        i64 revealRcv(CommPkg& comm, u64 partyIdx, const si64& x);
+
+        si64 remoteInt(u64 sPartyIdx, CommPkg& comm);
+        Sh4Task remoteInt(Sh4Task dep, u64 sPartyIdx, si64& dest);
+
+        void revealSend(CommPkg& comm, const si64& x);
+        i64 revealRcv(CommPkg& comm, const si64& x);
+
+        Sh4Task revealSend(Sh4Task dep, const si64& x);
+        Sh4Task revealRcv(Sh4Task dep, const si64& x, i64& dest);
+
     };
 }

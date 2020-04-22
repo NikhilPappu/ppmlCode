@@ -2,6 +2,8 @@
 #include <cstdlib>
 #include <cryptoTools/Network/IOService.h>
 #include "sh4/Sh4Encryptor.h"
+#include "sh4/Sh4Evaluator.h"
+#include "sh4/Sh4Runtime.h"
 
 using namespace oc;
 using namespace aby4;
@@ -82,69 +84,90 @@ void Sh4_Encryptor_IO_test()
 
     Sh4Encryptor enc[4];
     block seed1 = toBlock(0, 0); 
-    block seed2 = toBlock(1, 1); 
-    block seed3 = toBlock(2, 2); 
+    block seed2 = toBlock(0, 1); 
+    block seed3 = toBlock(0, 2); 
+    block seed4 = toBlock(1, 0);
+    block seed5 = toBlock(1, 1);
+    block seed6 = toBlock(1, 2);
    
     enc[0].init(0, seed1, seed2, seed3);
     enc[1].init(1, seed1);
     enc[2].init(2, seed2);
     enc[3].init(3, seed3);
 
+    Sh4Evaluator evals[4];
+    evals[0].init(0, seed4, seed5, seed6);
+    evals[1].init(1, seed4);
+    evals[2].init(2, seed5);
+    evals[3].init(3, seed6);
+
     bool failed = false;
 
     auto t0 = std::thread([&]()
     {
-        std::vector<si64> shr(4);
-        shr[0] = enc[0].localInt(0, comm[0], 60);
-        shr[1] = enc[0].remoteInt(0, 1, comm[0]);
-        shr[2] = enc[0].remoteInt(0, 2, comm[0]);
-        shr[3] = enc[0].remoteInt(0, 3, comm[0]);
+        Sh4Runtime rt(0, comm[0]);
+        Sh4Task task;
 
-        si64 shrEq = shr[0]*1 + shr[1]*2 + shr[2]*3 + shr[3]*4;
-        enc[0].revealSend(comm[0], 0, shrEq);
-        i64 ret0 = enc[0].revealRcv(comm[0], 0, shrEq);
+        std::vector<si64> shr(4);
+        shr[0] = enc[0].localInt(comm[0], 60);
+        shr[1] = enc[0].remoteInt(1, comm[0]);
+        shr[2] = enc[0].remoteInt(2, comm[0]);
+        shr[3] = enc[0].remoteInt(3, comm[0]);
+
+        //si64 shrEq = shr[0]*1 + shr[1]*2 + shr[2]*3 + shr[3]*4;
+        si64 shrEq = evals[0].asyncMul(comm[0], shr[0], shr[1]) + shr[2]*3 + shr[3]*4;
+        enc[0].revealSend(comm[0], shrEq);
+        i64 ret0;
+        ret0 = enc[0].revealRcv(comm[0], shrEq);
         std::cout << ret0 << std::endl;
     });
     
     auto t1 = std::thread([&]()
     {
+        Sh4Runtime rt(1, comm[1]);
         std::vector<si64> shr(4);
-        shr[0] = enc[1].remoteInt(1, 0, comm[1]);
-        shr[1] = enc[1].localInt(1, comm[1], 50);
-        shr[2] = enc[1].remoteInt(1, 2, comm[1]);
-        shr[3] = enc[1].remoteInt(1, 3, comm[1]);
 
-        si64 shrEq = shr[0]*1 + shr[1]*2 + shr[2]*3 + shr[3]*4;
-        enc[1].revealSend(comm[1], 1, shrEq);
-        i64 ret0 = enc[1].revealRcv(comm[1], 1, shrEq);
+        shr[0] = enc[1].remoteInt(0, comm[1]);
+        shr[1] = enc[1].localInt(comm[1], 50);
+        shr[2] = enc[1].remoteInt(2, comm[1]);
+        shr[3] = enc[1].remoteInt(3, comm[1]);
+
+        //si64 shrEq = shr[0]*1 + shr[1]*2 + shr[2]*3 + shr[3]*4;
+        si64 shrEq = evals[1].asyncMul(comm[1], shr[0], shr[1]) + shr[2]*3 + shr[3]*4;
+        enc[1].revealSend(comm[1], shrEq);
+        i64 ret0 = enc[1].revealRcv(comm[1], shrEq);
         std::cout << ret0 << std::endl;
     });
 
     auto t2 = std::thread([&]()
     {
+        Sh4Runtime rt(2, comm[2]);
         std::vector<si64> shr(4);
-        shr[0] = enc[2].remoteInt(2, 0, comm[2]);
-        shr[1] = enc[2].remoteInt(2, 1, comm[2]);
-        shr[2] = enc[2].localInt(2, comm[2], 40);
-        shr[3] = enc[2].remoteInt(2, 3, comm[2]);
+        shr[0] = enc[2].remoteInt(0, comm[2]);
+        shr[1] = enc[2].remoteInt(1, comm[2]);
+        shr[2] = enc[2].localInt(comm[2], 40);
+        shr[3] = enc[2].remoteInt(3, comm[2]);
 
-        si64 shrEq = shr[0]*1 + shr[1]*2 + shr[2]*3 + shr[3]*4;
-        enc[2].revealSend(comm[2], 2, shrEq);
-        i64 ret0 = enc[2].revealRcv(comm[2], 2, shrEq);
+        //si64 shrEq = shr[0]*1 + shr[1]*2 + shr[2]*3 + shr[3]*4;
+        si64 shrEq = evals[2].asyncMul(comm[2], shr[0], shr[1]) + shr[2]*3 + shr[3]*4;
+        enc[2].revealSend(comm[2], shrEq);
+        i64 ret0 = enc[2].revealRcv(comm[2], shrEq);
         std::cout << ret0 << std::endl;
     });
 
     auto t3 = std::thread([&]()
     {
+        Sh4Runtime rt(3, comm[3]);
         std::vector<si64> shr(4);
-        shr[0] = enc[3].remoteInt(3, 0, comm[3]);
-        shr[1] = enc[3].remoteInt(3, 1, comm[3]);
-        shr[2] = enc[3].remoteInt(3, 2, comm[3]);
-        shr[3] = enc[3].localInt(3, comm[3], 30);
+        shr[0] = enc[3].remoteInt(0, comm[3]);
+        shr[1] = enc[3].remoteInt(1, comm[3]);
+        shr[2] = enc[3].remoteInt(2, comm[3]);
+        shr[3] = enc[3].localInt(comm[3], 30);
 
-        si64 shrEq = shr[0]*1 + shr[1]*2 + shr[2]*3 + shr[3]*4;
-        enc[3].revealSend(comm[3], 3, shrEq);
-        i64 ret0 = enc[3].revealRcv(comm[3], 3, shrEq);
+        //si64 shrEq = shr[0]*1 + shr[1]*2 + shr[2]*3 + shr[3]*4;
+        si64 shrEq = evals[3].asyncMul(comm[3], shr[0], shr[1]) + shr[2]*3 + shr[3]*4;
+        enc[3].revealSend(comm[3], shrEq);
+        i64 ret0 = enc[3].revealRcv(comm[3], shrEq);
         std::cout << ret0 << std::endl;
     });
 
