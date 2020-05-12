@@ -55,75 +55,43 @@ namespace aby4
     Sh4Task Sh4Encryptor::remoteInt(Sh4Task dep, u64 sPartyIdx, si64& dest)
     {
         return dep.then([this, sPartyIdx, &dest](CommPkg& comm, Sh4Task& self){
-                             
-            si64 dest;
             dest[0] = mShareGen.getShare();
-            
+
             if(sPartyIdx == 0)
             {
-                auto fu = comm.mFar.asyncRecv(dest[1]); 
-
-                self.then([fu = std::move(fu)](CommPkg& comm, Sh4Task& self) mutable {
-                    fu.get();
-                });
+                comm.mFar.recv(dest[1]); 
             }
             else if(sPartyIdx == 1)
             {
-                if(this->mPartyIdx == 0)
+                if(mPartyIdx == 0)
                     comm.mPrev.asyncSendCopy(dest[0]);
-                else if(this->mPartyIdx == 2){
-                    auto fu = comm.mPrev.asyncRecv(dest[1]);
-                    self.then([fu = std::move(fu)](CommPkg& comm, Sh4Task& self) mutable {
-                        fu.get();
-                    });
-                }
-                else if(this->mPartyIdx == 3){
-                    auto fu = comm.mNext.asyncRecv(dest[1]);
-                    self.then([fu = std::move(fu)](CommPkg& comm, Sh4Task& self) mutable {
-                        fu.get();
-                    });
-                }
+                else if(mPartyIdx == 2)
+                    comm.mPrev.recv(dest[1]);
+                else if(mPartyIdx == 3)
+                    comm.mNext.recv(dest[1]);
             }
 
             else if(sPartyIdx == 2)
             {
-                if(this->mPartyIdx == 0)
+                if(mPartyIdx == 0)
                     comm.mNext.asyncSendCopy(dest[0]);
-                else if(this->mPartyIdx == 1){
-                    auto fu = comm.mNext.asyncRecv(dest[1]);
-                    self.then([fu = std::move(fu)](CommPkg& comm, Sh4Task& self) mutable {
-                        fu.get();
-                    });
-                }
-                else if(this->mPartyIdx == 3){
-                    auto fu = comm.mPrev.asyncRecv(dest[1]);
-
-                    self.then([fu = std::move(fu)](CommPkg& comm, Sh4Task& self) mutable {
-                        fu.get();
-                    });
-                }
+                else if(mPartyIdx == 1)
+                    comm.mNext.recv(dest[1]);
+                else if(mPartyIdx == 3)
+                    comm.mPrev.recv(dest[1]);
             }
-        
+            
             else if(sPartyIdx == 3)
             {
-                if(this->mPartyIdx == 0)
+
+                if(mPartyIdx == 0)
                     comm.mFar.asyncSendCopy(dest[0]);
-                else if(this->mPartyIdx == 1){
-                    auto fu = comm.mPrev.asyncRecv(dest[1]);
-                    self.then([fu = std::move(fu)](CommPkg& comm, Sh4Task& self) mutable {
-                        fu.get();
-                    });
-                }
-                else if(this->mPartyIdx == 2){
-                    auto fu = comm.mNext.asyncRecv(dest[1]);
-                    self.then([fu = std::move(fu)](CommPkg& comm, Sh4Task& self) mutable {
-                        fu.get();
-                    });
-                }
-
-            }
-
-        }).getClosure();
+                else if(mPartyIdx == 1)
+                    comm.mPrev.recv(dest[1]);
+                else if(mPartyIdx == 2)
+                comm.mNext.recv(dest[1]);
+            }                 
+        });
     }
 
     si64 Sh4Encryptor::remoteInt(u64 sPartyIdx, CommPkg & comm)
@@ -200,7 +168,7 @@ namespace aby4
             comm.mFar.asyncSendCopy(x[1]);
         }
     }
-/*
+
     Sh4Task Sh4Encryptor::revealRcv(Sh4Task dep, const si64& x, i64& dest)
     {
         return dep.then([this, &x, &dest](CommPkg& comm, Sh4Task& self){
@@ -208,12 +176,12 @@ namespace aby4
             if(this->mPartyIdx == 0)
             {
                 comm.mPrev.recv(dest);     
-                dest += x[0];
+                dest = dest - x[0];
             }
             else
             {
                 comm.mFar.recv(dest);
-                dest += x[1];
+                dest = x[1] - dest;
             }
         });
     }
@@ -232,5 +200,5 @@ namespace aby4
             }
         });
     }
-*/
+
 }

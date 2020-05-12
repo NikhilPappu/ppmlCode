@@ -1,4 +1,4 @@
-DIR=/home/nikhil/Desktop/ppml_code
+DIR=/home/nickpappu/Desktop/ppml_code
 
 default: 
 	
