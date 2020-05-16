@@ -175,8 +175,6 @@ void Sh4_Encryptor_IO_test()
 int main()
 {
     Sh4_Encryptor_IO_test();
-//    Sh4_Encryptor_asyncIO_test();
-    std::cout << "Yoooo!" << std::endl; 
 
     return 0;
 }
