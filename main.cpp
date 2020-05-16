@@ -62,16 +62,23 @@ void Sh4_Encryptor_IO_test()
     auto t0 = std::thread([&]()
     {
         Sh4Runtime rt(0, comm[0]);
-        //auto& e = enc[0];
         std::vector<si64> shr(4);
         auto& e = enc[0];
-        e.localInt(rt.noDependencies(), 60, shr[0]).get();
-        e.remoteInt(rt.noDependencies(), 1, shr[1]).get();
-        e.remoteInt(rt.noDependencies(), 2, shr[2]).get();
-        e.remoteInt(rt.noDependencies(), 3, shr[3]).get();
+        auto& ev = evals[0];
+        Sh4Task task;
+        task = e.localInt(rt.noDependencies(), 60, shr[0]);
+        task&= e.remoteInt(rt.noDependencies(), 1, shr[1]);
+        task&= e.remoteInt(rt.noDependencies(), 2, shr[2]);
+        task&= e.remoteInt(rt.noDependencies(), 3, shr[3]);
 
-        si64 shrEq = shr[0]*1 + shr[1]*2 + shr[2]*3 + shr[3]*4;
-        //si64 shrEq = evals[0].asyncMul(comm[0], shr[0], shr[1]) + shr[2]*3 + shr[3]*4;
+        task.get();
+
+        si64 prod;
+        task = ev.asyncMul(task, shr[0], shr[1], prod);
+        task.get();
+        
+
+        si64 shrEq = prod + shr[2]*3 + shr[3]*4;
         e.revealSend(rt.noDependencies(), shrEq).get();
         i64 ret0;
         e.revealRcv(rt.noDependencies(), shrEq, ret0).get();
@@ -83,14 +90,22 @@ void Sh4_Encryptor_IO_test()
         Sh4Runtime rt(1, comm[1]);
         std::vector<si64> shr(4); 
         auto& e = enc[1];
-        e.remoteInt(rt.noDependencies(), 0, shr[0]).get();
-        e.localInt(rt.noDependencies(), 50, shr[1]).get();
-        e.remoteInt(rt.noDependencies(), 2, shr[2]).get();
-        e.remoteInt(rt.noDependencies(), 3, shr[3]).get();
+        auto& ev = evals[1];
+        Sh4Task task;
+        task = e.remoteInt(rt.noDependencies(), 0, shr[0]);
+        task&= e.localInt(rt.noDependencies(), 50, shr[1]);
+        task&= e.remoteInt(rt.noDependencies(), 2, shr[2]);
+        task&= e.remoteInt(rt.noDependencies(), 3, shr[3]);
 
-//        si64 shrEq = shr[0] + shr[1];
-        si64 shrEq = shr[0]*1 + shr[1]*2 + shr[2]*3 + shr[3]*4;
-        //si64 shrEq = evals[1].asyncMul(comm[1], shr[0], shr[1]) + shr[2]*3 + shr[3]*4;
+        task.get();
+
+        si64 prod;
+        task = ev.asyncMul(task, shr[0], shr[1], prod);
+        task.get();
+        
+
+        si64 shrEq = prod + shr[2]*3 + shr[3]*4;
+
         e.revealSend(rt.noDependencies(), shrEq).get();
         i64 ret0;
         e.revealRcv(rt.noDependencies(), shrEq, ret0).get();
@@ -102,15 +117,21 @@ void Sh4_Encryptor_IO_test()
         Sh4Runtime rt(2, comm[2]);
         std::vector<si64> shr(4);
         auto& e = enc[2];
-        e.remoteInt(rt.noDependencies(), 0, shr[0]).get();
-        e.remoteInt(rt.noDependencies(), 1, shr[1]).get();
-        //task.get();
-        e.localInt(rt.noDependencies(), 40, shr[2]).get();
-        e.remoteInt(rt.noDependencies(), 3, shr[3]).get();
+        auto& ev = evals[2];
+        Sh4Task task;
+        task = e.remoteInt(rt.noDependencies(), 0, shr[0]);
+        task&= e.remoteInt(rt.noDependencies(), 1, shr[1]);
+        task&= e.localInt(rt.noDependencies(), 40, shr[2]);
+        task&= e.remoteInt(rt.noDependencies(), 3, shr[3]);
 
-        //si64 shrEq = shr[0] + shr[1];
-        si64 shrEq = shr[0]*1 + shr[1]*2 + shr[2]*3 + shr[3]*4;
-//        si64 shrEq = evals[2].asyncMul(comm[2], shr[0], shr[1]) + shr[2]*3 + shr[3]*4;
+        task.get();
+
+        si64 prod;
+        task = ev.asyncMul(task, shr[0], shr[1], prod);
+        task.get();
+        
+
+        si64 shrEq = prod + shr[2]*3 + shr[3]*4;
         e.revealSend(rt.noDependencies(), shrEq).get();
         i64 ret0;
         e.revealRcv(rt.noDependencies(), shrEq, ret0).get();
@@ -122,14 +143,21 @@ void Sh4_Encryptor_IO_test()
         Sh4Runtime rt(3, comm[3]);
         std::vector<si64> shr(4);
         auto& e = enc[3];
-        e.remoteInt(rt.noDependencies(), 0, shr[0]).get();
-        e.remoteInt(rt.noDependencies(), 1, shr[1]).get();
-        e.remoteInt(rt.noDependencies(), 2, shr[2]).get();
-        e.localInt(rt.noDependencies(), 30, shr[3]).get();
+        auto& ev = evals[3];
+        Sh4Task task;
+        task = e.remoteInt(rt.noDependencies(), 0, shr[0]);
+        task &= e.remoteInt(rt.noDependencies(), 1, shr[1]);
+        task &= e.remoteInt(rt.noDependencies(), 2, shr[2]);
+        task&= e.localInt(rt.noDependencies(), 30, shr[3]);
 
-        //si64 shrEq = shr[0] + shr[1];
-        si64 shrEq = shr[0]*1 + shr[1]*2 + shr[2]*3 + shr[3]*4;
-//        si64 shrEq = evals[3].asyncMul(comm[3], shr[0], shr[1]) + shr[2]*3 + shr[3]*4;
+        task.get();
+
+        si64 prod;
+        task = ev.asyncMul(task, shr[0], shr[1], prod);
+        task.get();
+        
+
+        si64 shrEq = prod + shr[2]*3 + shr[3]*4;
         e.revealSend(rt.noDependencies(), shrEq).get();
         i64 ret0;
         e.revealRcv(rt.noDependencies(), shrEq, ret0).get();

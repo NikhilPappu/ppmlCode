@@ -26,6 +26,7 @@ namespace aby4
         }
 
         si64 asyncMul(CommPkg& comm, const si64& A, const si64& B);
+        Sh4Task asyncMul(Sh4Task dep, const si64& A, const si64& B, si64& C);
 
     };
 }

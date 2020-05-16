@@ -30,26 +30,26 @@ namespace aby4
 
     Sh4Task Sh4Encryptor::localInt(Sh4Task dep, i64 val, si64& dest)
     {
-        return dep.then([this, val, &dest](CommPkg& comm, Sh4Task& self) {
          
+        return dep.then([this, val, &dest](CommPkg& comm, Sh4Task& self) {
             dest[0] = mShareGen.getShare();
             dest[1] = 0;
 
             if(mPartyIdx == 0) 
             {
-                comm.mPrev.asyncSendCopy(val + dest[0]);
-                comm.mNext.asyncSendCopy(val + dest[0]);
-                comm.mFar.asyncSendCopy(val + dest[0]);
+                    comm.mPrev.asyncSendCopy(val + dest[0]);
+                    comm.mNext.asyncSendCopy(val + dest[0]);
+                    comm.mFar.asyncSendCopy(val + dest[0]);
             }
             else
             {
-                comm.mFar.recv(dest[1]);
-                dest[1] = val + dest[1];
-                comm.mPrev.asyncSendCopy(dest[1]);
-                comm.mNext.asyncSendCopy(dest[1]);
+                    comm.mFar.recv(dest[1]);
+                    dest[1] = val + dest[1];
+                    comm.mPrev.asyncSendCopy(dest[1]);
+                    comm.mNext.asyncSendCopy(dest[1]);
             }
-
         });
+
     }
 
     Sh4Task Sh4Encryptor::remoteInt(Sh4Task dep, u64 sPartyIdx, si64& dest)
