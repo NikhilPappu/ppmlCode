@@ -18,7 +18,7 @@ cd ../..
 ```
 Now, modify the `${DIR}` variable in the Makefile to the path of the parent directory of the code.
 
-Then, run
+Then, run the following to get the output of main.cpp
 
 ```
 make
