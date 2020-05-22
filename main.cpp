@@ -66,6 +66,7 @@ void Sh4_Encryptor_IO_test()
         auto& e = enc[0];
         auto& ev = evals[0];
         Sh4Task task;
+        std::cout << "Input of party 0: 60" << std::endl;
         task = e.localInt(rt.noDependencies(), 60, shr[0]);
         task&= e.remoteInt(rt.noDependencies(), 1, shr[1]);
         task&= e.remoteInt(rt.noDependencies(), 2, shr[2]);
@@ -82,7 +83,7 @@ void Sh4_Encryptor_IO_test()
         e.revealSend(rt.noDependencies(), shrEq).get();
         i64 ret0;
         e.revealRcv(rt.noDependencies(), shrEq, ret0).get();
-        std::cout << ret0 << std::endl;
+        std::cout << "Output of party 0: " << ret0 << std::endl;
     });
     
     auto t1 = std::thread([&]()
@@ -92,6 +93,7 @@ void Sh4_Encryptor_IO_test()
         auto& e = enc[1];
         auto& ev = evals[1];
         Sh4Task task;
+        std::cout << "Input of party 1: 50" << std::endl;
         task = e.remoteInt(rt.noDependencies(), 0, shr[0]);
         task&= e.localInt(rt.noDependencies(), 50, shr[1]);
         task&= e.remoteInt(rt.noDependencies(), 2, shr[2]);
@@ -109,7 +111,7 @@ void Sh4_Encryptor_IO_test()
         e.revealSend(rt.noDependencies(), shrEq).get();
         i64 ret0;
         e.revealRcv(rt.noDependencies(), shrEq, ret0).get();
-        std::cout << ret0 << std::endl;
+        std::cout << "Output of party 1: " << ret0 << std::endl;
     });
 
     auto t2 = std::thread([&]()
@@ -119,6 +121,7 @@ void Sh4_Encryptor_IO_test()
         auto& e = enc[2];
         auto& ev = evals[2];
         Sh4Task task;
+        std::cout << "Input of party 2: 40" << std::endl;
         task = e.remoteInt(rt.noDependencies(), 0, shr[0]);
         task&= e.remoteInt(rt.noDependencies(), 1, shr[1]);
         task&= e.localInt(rt.noDependencies(), 40, shr[2]);
@@ -135,7 +138,7 @@ void Sh4_Encryptor_IO_test()
         e.revealSend(rt.noDependencies(), shrEq).get();
         i64 ret0;
         e.revealRcv(rt.noDependencies(), shrEq, ret0).get();
-        std::cout << ret0 << std::endl;
+        std::cout << "Output of party 2: " << ret0 << std::endl;
     });
 
     auto t3 = std::thread([&]()
@@ -145,6 +148,7 @@ void Sh4_Encryptor_IO_test()
         auto& e = enc[3];
         auto& ev = evals[3];
         Sh4Task task;
+        std::cout << "Input of party 3: 30" << std::endl;
         task = e.remoteInt(rt.noDependencies(), 0, shr[0]);
         task &= e.remoteInt(rt.noDependencies(), 1, shr[1]);
         task &= e.remoteInt(rt.noDependencies(), 2, shr[2]);
@@ -161,7 +165,7 @@ void Sh4_Encryptor_IO_test()
         e.revealSend(rt.noDependencies(), shrEq).get();
         i64 ret0;
         e.revealRcv(rt.noDependencies(), shrEq, ret0).get();
-        std::cout << ret0 << std::endl;
+        std::cout << "Output of party 3: " << ret0 << std::endl;
     });
 
     t0.join();
@@ -174,6 +178,7 @@ void Sh4_Encryptor_IO_test()
 
 int main()
 {
+    std::cout << "Computing function: i0 * i1 + 3*i2 + 4*i3:" << std::endl;;
     Sh4_Encryptor_IO_test();
 
     return 0;
